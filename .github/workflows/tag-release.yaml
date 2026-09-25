@@ -8,10 +8,49 @@ permissions:
   contents: write
 
 jobs:
-  tag-and-release:
-    name: Tag, Build, Release
+  tag:
+    name: Create Tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      created: ${{ steps.create_tag.outputs.created }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION="v$(cat VERSION)"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Tag: $VERSION"
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create tag
+        id: create_tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
+          echo "created=true" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build (${{ matrix.goos }}/${{ matrix.goarch }})
+    needs: tag
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - goos: linux
@@ -33,30 +72,6 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Read version
-        id: version
-        run: |
-          VERSION="v$(cat VERSION)"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Tag: $VERSION"
-
-      - name: Check if tag exists
-        id: check_tag
-        run: |
-          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create tag
-        if: steps.check_tag.outputs.exists == 'false'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag ${{ steps.version.outputs.version }}
-          git push origin ${{ steps.version.outputs.version }}
-
       - name: Build
         env:
           GOOS: ${{ matrix.goos }}
@@ -76,7 +91,7 @@ jobs:
 
   publish:
     name: Publish Release
-    needs: tag-and-release
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
