@@ -82,6 +82,7 @@ jobs:
           ext=""
           if [ "$GOOS" = "windows" ]; then ext=".exe"; fi
           go build -trimpath -ldflags "-s -w" -o "dist/ipkit-${{ matrix.goos }}-${{ matrix.goarch }}${ext}" ./cmd/ipkit
+          cp README.md LICENSE dist/
           tar -czf "dist/ipkit-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz" -C dist "ipkit-${{ matrix.goos }}-${{ matrix.goarch }}${ext}" README.md LICENSE
 
       - uses: actions/upload-artifact@v4
