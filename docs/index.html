@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ipkit — Agentic-First IP Address & Network Utility</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+  .hero { text-align: center; padding: 3rem 0; }
+  .hero h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+  .hero p { color: var(--muted); font-size: 1.2rem; margin-bottom: 1.5rem; }
+  .badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .badge { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 0.25rem 0.75rem; font-size: 0.85rem; }
+  .badge.go { color: var(--accent); }
+  .badge.no-db { color: var(--green); }
+  .cta { display: flex; gap: 1rem; justify-content: center; }
+  .cta a { padding: 0.6rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; }
+  .cta .primary { background: var(--accent); color: var(--bg); }
+  .cta .secondary { border: 1px solid var(--border); color: var(--text); }
+  section { padding: 2rem 0; }
+  h2 { font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1.5rem; }
+  .card h3 { color: var(--accent); margin-bottom: 0.5rem; }
+  .card p { color: var(--muted); font-size: 0.9rem; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+  th, td { text-align: left; padding: 0.6rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--accent); }
+  td code { background: var(--surface); padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-size: 0.85rem; }
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem; overflow-x: auto; }
+  code { font-family: "SF Mono", Monaco, "Cascadia Code", monospace; }
+  .footer { text-align: center; padding: 2rem 0; color: var(--muted); border-top: 1px solid var(--border); }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2rem; }
+    .cta { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <h1>ipkit</h1>
+    <p>Agentic-first IP address & network utility service</p>
+    <div class="badges">
+      <span class="badge go">Go</span>
+      <span class="badge no-db">No Database</span>
+      <span class="badge">Plain Text API</span>
+      <span class="badge">MCP</span>
+      <span class="badge">Single Binary</span>
+    </div>
+    <div class="cta">
+      <a class="primary" href="https://github.com/relentlessworks/ipkit">View on GitHub</a>
+      <a class="secondary" href="https://github.com/relentlessworks/ipkit#quick-start">Quick Start</a>
+    </div>
+  </div>
+
+  <section>
+    <h2>Principles</h2>
+    <div class="grid">
+      <div class="card"><h3>Agent IS the Interface</h3><p>No UI, no SDK. The API is the product. Every endpoint is designed for an AI agent to call.</p></div>
+      <div class="card"><h3>Plain Text by Default</h3><p>One labeled, grepable line per record. Token-cheap. JSON on demand via Accept header or ?format=json.</p></div>
+      <div class="card"><h3>Instructive Errors</h3><p>Every 4xx includes a hint telling the agent what to do next. Self-correct without a schema.</p></div>
+      <div class="card"><h3>Self-Documenting</h3><p>GET /help returns a one-page operating manual the agent loads at runtime.</p></div>
+      <div class="card"><h3>Single Binary</h3><p>Go, CGO_ENABLED=0, zero external dependencies. Deploys as one file.</p></div>
+      <div class="card"><h3>Zero Config</h3><p>Runs out of the box. Config layered: defaults < file < env < flags.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>API Reference</h2>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td>GET</td><td><code>/ip/{addr}</code></td><td>Parse and classify IP address</td></tr>
+      <tr><td>GET</td><td><code>/validate?ip=</code></td><td>Validate IP address</td></tr>
+      <tr><td>GET</td><td><code>/binary?ip=</code></td><td>Binary representation</td></tr>
+      <tr><td>GET</td><td><code>/reverse?ip=</code></td><td>Reverse DNS lookup</td></tr>
+      <tr><td>GET</td><td><code>/toint?ip=</code></td><td>IP to integer</td></tr>
+      <tr><td>GET</td><td><code>/fromint?n=</code></td><td>Integer to IPv4</td></tr>
+      <tr><td>GET</td><td><code>/cidr/{cidr}</code></td><td>Parse CIDR notation</td></tr>
+      <tr><td>GET</td><td><code>/contains?ip=&cidr=</code></td><td>Check IP in CIDR range</td></tr>
+      <tr><td>GET</td><td><code>/subnet?cidr=&prefix=</code></td><td>Divide CIDR into subnets</td></tr>
+      <tr><td>GET</td><td><code>/compare?ip1=&ip2=</code></td><td>Compare two IPs</td></tr>
+      <tr><td>POST</td><td><code>/mcp</code></td><td>MCP JSON-RPC 2.0 (10 tools)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Quick Start</h2>
+    <pre><code>make build
+./ipkit
+# Listening on :7700
+
+curl http://localhost:7700/ip/192.168.1.1
+# ip=192.168.1.1 version=4 type=private private=true ...
+
+curl http://localhost:7700/cidr/10.0.0.0/24
+# cidr=10.0.0.0/24 network=10.0.0.0 broadcast=10.0.0.255 ...
+
+curl "http://localhost:7700/contains?ip=10.0.0.5&cidr=10.0.0.0/24"
+# ip=10.0.0.5 cidr=10.0.0.0/24 contains=true
+
+curl "http://localhost:7700/subnet?cidr=192.168.1.0/24&prefix=26"
+# 192.168.1.0/26
+# 192.168.1.64/26
+# 192.168.1.128/26
+# 192.168.1.192/26</code></pre>
+  </section>
+
+  <section>
+    <h2>Configuration</h2>
+    <table>
+      <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+      <tr><td><code>IPKIT_ADDR</code></td><td><code>:7700</code></td><td>Listen address</td></tr>
+      <tr><td><code>IPKIT_SECRET</code></td><td>(auto)</td><td>Auth token secret</td></tr>
+    </table>
+  </section>
+
+  <div class="footer">
+    <p>relentlessworks — agentic-first services for AI, not for humans.</p>
+  </div>
+</div>
+</body>
+</html>

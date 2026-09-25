@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'VERSION'
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: Vet, Test, Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Go vet
+        run: go vet ./...
+      - name: Go test
+        run: go test -race ./...
+      - name: Go build
+        run: CGO_ENABLED=0 go build -trimpath ./cmd/ipkit
+
+  cross-compile:
+    name: Cross-Compile
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        goos: [linux, linux, darwin, darwin, windows]
+        goarch: [amd64, arm64, amd64, arm64, amd64]
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+          - goos: windows
+            goarch: amd64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          mkdir -p dist
+          ext=""
+          if [ "$GOOS" = "windows" ]; then ext=".exe"; fi
+          go build -trimpath -ldflags "-s -w" -o "dist/ipkit-${{ matrix.goos }}-${{ matrix.goarch }}${ext}" ./cmd/ipkit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipkit-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/

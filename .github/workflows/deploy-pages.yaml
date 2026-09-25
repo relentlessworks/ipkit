@@ -1,0 +1,41 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Save docs to temp
+          cp -r docs /tmp/docs-backup
+          
+          # Checkout gh-pages
+          git checkout --orphan gh-pages || git checkout gh-pages
+          git rm -rf . || true
+          
+          # Copy docs
+          cp -r /tmp/docs-backup/* .
+          
+          git add -A
+          git commit -m "Deploy docs to gh-pages" || echo "No changes to commit"
+          git push origin gh-pages --force

@@ -1,0 +1,8 @@
+/ipkit
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
